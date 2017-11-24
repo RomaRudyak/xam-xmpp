@@ -16,7 +16,7 @@ namespace Xam.XMMP
         {
             InitializeComponent();
 
-            MainPage = new ContentPage { Content = new Label { Text = "Hello RORU!" } };
+            MainPage = new LoginPage();
         }
 
     }
