@@ -5,10 +5,10 @@
     <ContentPage.Content>
         <StackLayout VerticalOptions="Center">
             <Entry x:Name="_login"
-                   Text="xam.jab"
+                   Text="xam.jab2@chinwag.im"
                    Placeholder="Login" />
             <Entry x:Name="_pass"
-                   Text="xam.jab"
+                   Text="xam.jab2"
                    Placeholder="Password" 
                    IsPassword="True"/>
             <Button Text="Login"
