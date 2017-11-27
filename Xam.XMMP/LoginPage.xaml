@@ -5,9 +5,12 @@
     <ContentPage.Content>
         <StackLayout VerticalOptions="Center">
             <Entry x:Name="_login"
+                   Text="xam.jab@jabber.to"
                    Placeholder="Login" />
             <Entry x:Name="_pass"
-                   Placeholder="Password" />
+                   Text="xam.jab"
+                   Placeholder="Password" 
+                   IsPassword="True"/>
             <Button Text="Login"
                     Clicked="Login_Click" />
         </StackLayout>
