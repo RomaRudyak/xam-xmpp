@@ -17,6 +17,7 @@ using SharpXMPP.XMPP.SASL;
 using SharpXMPP.XMPP.Stream.Elements;
 using SharpXMPP.XMPP.TLS.Elements;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace SharpXMPP
 {
@@ -95,32 +96,35 @@ namespace SharpXMPP
             Writer.WriteEndElement();
         }
 
-        public override void SessionLoop()
+        public override Task SessionLoop()
         {
-            while (true)
+            return Task.Run(() =>
             {
-                try
+                while (true)
                 {
-                    var el = NextElement();
-                    if (el.Name.LocalName.Equals("iq"))
+                    try
                     {
-                        OnIq(Stanza.Parse<XMPPIq>(el));
+                        var el = NextElement();
+                        if (el.Name.LocalName.Equals("iq"))
+                        {
+                            OnIq(Stanza.Parse<XMPPIq>(el));
+                        }
+                        if (el.Name.LocalName.Equals("message"))
+                        {
+                            OnMessage(Stanza.Parse<XMPPMessage>(el));
+                        }
+                        if (el.Name.LocalName.Equals("presence"))
+                        {
+                            OnPresence(Stanza.Parse<XMPPPresence>(el));
+                        }
                     }
-                    if (el.Name.LocalName.Equals("message"))
+                    catch (Exception e)
                     {
-                        OnMessage(Stanza.Parse<XMPPMessage>(el));
-                    }
-                    if (el.Name.LocalName.Equals("presence"))
-                    {
-                        OnPresence(Stanza.Parse<XMPPPresence>(el));
+                        OnConnectionFailed(new ConnFailedArgs { Message = e.Message });
+                        break;
                     }
                 }
-                catch (Exception e)
-                {
-                    OnConnectionFailed(new ConnFailedArgs { Message = e.Message });
-                    break;
-                }
-            }
+            });
         }
 
         public override async Task Connect()
