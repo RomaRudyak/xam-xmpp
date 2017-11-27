@@ -4,6 +4,7 @@ using Android.OS;
 using Xamarin.Forms.Platform.Android;
 using Xamarin.Forms;
 using Xam.XMMP;
+using Acr.UserDialogs;
 
 namespace Xam.XMPP.Droid
 {
@@ -17,6 +18,7 @@ namespace Xam.XMPP.Droid
 
             base.OnCreate(savedInstanceState);
 
+            UserDialogs.Init(this);
             Forms.Init(this, savedInstanceState);
 
             LoadApplication(new App());

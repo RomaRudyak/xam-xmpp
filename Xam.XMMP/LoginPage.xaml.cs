@@ -1,4 +1,6 @@
-﻿using Sharp.Xmpp.Client;
+﻿using Acr.UserDialogs;
+using SharpXMPP;
+using SharpXMPP.XMPP.Client.Elements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,10 @@ namespace Xam.XMMP
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class LoginPage : ContentPage
 	{
-		public LoginPage ()
+        private string _domain = "@chinwag.im";
+
+
+        public LoginPage ()
 		{
 			InitializeComponent ();
 		}
@@ -24,10 +29,26 @@ namespace Xam.XMMP
             var login = _login.Text;
             var pass = _pass.Text;
 
-            using (var client = new XmppClient("jabber.to", login, pass))
-            {
-                client.SendMessage(new Sharp.Xmpp.Im.Message(new Sharp.Xmpp.Jid("xam.jab@jabber.to"), "Hi xam!!"));
-            }
+            var client = new XmppClient(new SharpXMPP.XMPP.JID($"{login}@{_domain}"), pass);
+            client.Connect();
+            client.ConnectionFailed += Client_ConnectionFailed;
+            client.SignedIn += Client_SignedIn;
         }
-	}
+
+        private void Client_SignedIn(XmppConnection sender, SignedInArgs e)
+        {
+            sender.Send(new XMPPMessage() {
+                Text = "Hello RORU!",
+                To = e.Jid
+            });
+        }
+
+        private void Client_ConnectionFailed(XmppConnection sender, ConnFailedArgs e)
+        {
+            UserDialogs.Instance.Alert(new AlertConfig
+            {
+                Message = e.Message
+            });
+        }
+    }
 }

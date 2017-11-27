@@ -5,7 +5,7 @@
     <ContentPage.Content>
         <StackLayout VerticalOptions="Center">
             <Entry x:Name="_login"
-                   Text="xam.jab@jabber.to"
+                   Text="xam.jab"
                    Placeholder="Login" />
             <Entry x:Name="_pass"
                    Text="xam.jab"
