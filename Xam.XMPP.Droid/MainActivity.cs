@@ -19,6 +19,7 @@ namespace Xam.XMPP.Droid
             base.OnCreate(savedInstanceState);
 
             UserDialogs.Init(this);
+            Forms.SetFlags("FastRenderers_Experimental");
             Forms.Init(this, savedInstanceState);
 
             LoadApplication(new App());
