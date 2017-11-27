@@ -35,7 +35,8 @@ namespace Xam.XMMP
                 return;
             }
             var rester = (RosterItem)e.SelectedItem;
-            Navigation.PushModalAsync(new Chat(rester));
+            _users.SelectedItem = null;
+            Navigation.PushModalAsync(new Chat(rester, _xmppconnetction));
         }
     }
 }
