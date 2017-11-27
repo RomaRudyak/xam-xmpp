@@ -7,6 +7,7 @@ using SharpXMPP.XMPP.Client.Disco.Elements;
 using SharpXMPP.XMPP.Client.Elements;
 using System;
 using SharpXMPP.XMPP.Stream.Elements;
+using System.Threading.Tasks;
 
 namespace SharpXMPP
 {
@@ -161,6 +162,6 @@ namespace SharpXMPP
         }
 
         public abstract void SessionLoop();
-        public abstract void Connect();
+        public abstract Task Connect();
     }
 }

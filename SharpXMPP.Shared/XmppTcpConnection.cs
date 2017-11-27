@@ -16,6 +16,7 @@ using SharpXMPP.XMPP.Client.Elements;
 using SharpXMPP.XMPP.SASL;
 using SharpXMPP.XMPP.Stream.Elements;
 using SharpXMPP.XMPP.TLS.Elements;
+using System.Threading.Tasks;
 
 namespace SharpXMPP
 {
@@ -122,7 +123,7 @@ namespace SharpXMPP
             }
         }
 
-        public override async void Connect()
+        public override async Task Connect()
         {
             List<IPAddress> HostAddresses = new List<IPAddress>();
 
@@ -165,6 +166,7 @@ namespace SharpXMPP
                 }
             }
 
+            var authTCS = new TaskCompletionSource<bool>();
             var authenticator = SASLHandler.Create(features.SaslMechanisms, Jid, Password);
             if (authenticator == null)
             {
@@ -175,15 +177,20 @@ namespace SharpXMPP
             {
                 RestartXmlStreams();
                 var session = new SessionHandler();
-                session.SessionStarted += connection => OnSignedIn(new SignedInArgs { Jid = connection.Jid });
+                session.SessionStarted += connection =>
+                {
+                    OnSignedIn(new SignedInArgs { Jid = connection.Jid });
+                    authTCS.SetResult(true);
+                };
                 session.Start(this);
             };
             authenticator.AuthenticationFailed += sender =>
             {
                 OnConnectionFailed(new ConnFailedArgs { Message = "Authentication failed" });
-                return;
+                authTCS.SetResult(false);
             };
             authenticator.Start(this);
+            await authTCS.Task;
         }
     }
 }

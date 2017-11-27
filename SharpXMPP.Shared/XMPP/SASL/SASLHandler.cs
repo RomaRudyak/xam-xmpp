@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SharpXMPP.XMPP.SASL.Elements;
+using System.Threading.Tasks;
 
 namespace SharpXMPP.XMPP.SASL
 {
@@ -12,7 +13,7 @@ namespace SharpXMPP.XMPP.SASL
 
         public delegate void AuthenticatedHandler(XmppConnection sender);
 
-        public event AuthenticatedHandler Authenticated = delegate {};
+        public event AuthenticatedHandler Authenticated = delegate { };
 
         protected virtual void OnAuthenticated(XmppConnection sender)
         {
@@ -33,7 +34,7 @@ namespace SharpXMPP.XMPP.SASL
         public static SASLHandler Create(List<string> availableMethods, JID clientJID, string password)
         {
             // return availableMethods.Contains("SCRAM-SHA-1") ? new SASLSCRAM { ClientJID = clientJID, Password = password} : null;
-            return new SASLSCRAM { ClientJID = clientJID, Password = password};
+            return new SASLSCRAM { ClientJID = clientJID, Password = password };
         }
 
         public void Start(XmppConnection connection)
@@ -44,19 +45,22 @@ namespace SharpXMPP.XMPP.SASL
             connection.Send(auth);
             var authResponse = connection.NextElement();
             var nextResponse = string.Empty;
-            while ((nextResponse = NextChallenge(authResponse.Value)) != "")
+            Task.Run(() =>
             {
-                if (nextResponse == "error")
+                while ((nextResponse = NextChallenge(authResponse.Value)) != "")
                 {
-                    OnAuthenticationFailed(connection);
-                    return;
+                    if (nextResponse == "error")
+                    {
+                        OnAuthenticationFailed(connection);
+                        return;
+                    }
+                    var response = new SASLResponse();
+                    response.SetValue(nextResponse);
+                    connection.Send(response);
+                    authResponse = connection.NextElement();
                 }
-                var response = new SASLResponse();
-                response.SetValue(nextResponse);
-                connection.Send(response);
-                authResponse = connection.NextElement();
-            }
-            OnAuthenticated(connection);
+                OnAuthenticated(connection);
+            });
         }
     }
 }
